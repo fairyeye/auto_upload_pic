@@ -138,7 +138,7 @@ export default class AutoUploadPicImageUrl extends Plugin {
 		}
 	};
 
-	async upload(image: File): Promise<string> {
+	async upload(image: File): Promise<ImgurPostData> {
 		new Notice("uploading...");
 		const requestData = new FormData();
 		requestData.append("file", image);
@@ -156,7 +156,7 @@ export default class AutoUploadPicImageUrl extends Plugin {
 		if (!resp.ok) {
 			new Notice("error...");
 		}
-		return ((await resp.json()) as ImgurPostData).data.url;
+		return ((await resp.json()) as ImgurPostData);
 	}
 
 	onunload() {}
@@ -177,7 +177,7 @@ export default class AutoUploadPicImageUrl extends Plugin {
 		const pasteId = (Math.random() + 1).toString(36).substr(2, 5);
 		this.insertTemporaryText(pasteId);
 
-		let imgUrl: string;
+		let imgUrl: ImgurPostData;
 		try {
 			imgUrl = await this.upload(file);
 		} catch (e) {
@@ -186,8 +186,8 @@ export default class AutoUploadPicImageUrl extends Plugin {
 				`Upload failed, remote server returned an error: ${e.message}`
 			);
 		}
-		new Notice("upload success:imgurl is :" + imgUrl);
-		this.embedMarkDownImage(pasteId, imgUrl);
+		new Notice("upload success:imgurl is :" + imgUrl.data.url);
+		this.embedMarkDownImage(pasteId, imgUrl.data.url);
 	}
 
 	private handleFailedUpload(pasteId: string, message: string) {
